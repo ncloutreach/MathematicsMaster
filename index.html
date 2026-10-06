@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathematics Masters: Lead the Way</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #FFC107;
+            --accent-color: #2196F3;
+            --dark-color: #333;
+            --light-color: #f9f9f9;
+            --error-color: #F44336;
+            --success-color: #8BC34A;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .game-container {
+            width: 100vw;
+            height: 100vh;
+            max-width: 100vw;
+            max-height: 100vh;
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Screen containers */
+        .screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+        }
+        
+        .screen.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Creator Banner Screen */
+        #creator-banner {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            padding: clamp(2px, 0.5vh, 5px) clamp(5px, 1vw, 10px);
+            min-height: 100vh;
+        }
+        
+        #creator-banner img {
+            max-width: min(90vw, 800px);
+            max-height: min(70vh, 600px);
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            margin: 0 auto clamp(5px, 1vh, 10px) auto;
+        }
+        
+        .start-btn {
+            background: linear-gradient(135deg, var(--primary-color), #45a049);
+            color: white;
+            border: none;
+            padding: clamp(8px, 1.5vh, 12px) clamp(25px, 4vw, 40px);
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: bold;
+            margin: 0;
+            min-height: 40px;
+            touch-action: manipulation;
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        
+        /* Welcome Screen */
+        #welcome-screen {
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.9);
+            overflow-y: auto;
+            height: 100%;
+            gap: 0;
+        }
+        
+        .welcome-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: clamp(15px, 3vh, 25px) clamp(15px, 3vw, 25px) clamp(2px, 0.5vh, 5px);
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .welcome-header {
+            text-align: center;
+            margin-bottom: clamp(10px, 2vh, 15px);
+        }
+        
+        .welcome-header h1 {
+            font-size: clamp(1.3rem, 4vw, 2rem);
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: clamp(8px, 2vh, 15px);
+            line-height: 1.3;
+        }
+        
+        .game-introduction {
+            text-align: center;
+            margin-bottom: clamp(10px, 2vh, 15px);
+        }
+        
+        .game-introduction h2 {
+            font-size: clamp(1.1rem, 3vw, 1.5rem);
+            color: var(--primary-color);
+            margin-bottom: clamp(8px, 1.5vh, 12px);
+        }
+        
+        .game-introduction p {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: var(--dark-color);
+            line-height: 1.5;
+        }
+        
+        .game-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: clamp(6px, 1.2vw, 10px);
+            margin-bottom: 0;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 6px;
+            padding: clamp(6px, 1.2vh, 10px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.3s;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .feature-card.top-row {
+            grid-column: span 1;
+        }
+        
+        .feature-card.bottom-row {
+            grid-column: span 1;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            margin-bottom: clamp(3px, 0.6vh, 5px);
+        }
+        
+        .feature-title {
+            font-size: clamp(0.75rem, 1.6vw, 0.9rem);
+            color: var(--dark-color);
+            margin-bottom: clamp(2px, 0.4vh, 4px);
+            font-weight: bold;
+        }
+        
+        .feature-description {
+            font-size: clamp(0.65rem, 1.2vw, 0.8rem);
+            color: #666;
+            line-height: 1.2;
+        }
+        
+        .welcome-footer {
+            text-align: center;
+            padding: 2px 0;
+            margin: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        
+        .next-btn {
+            background: linear-gradient(135deg, var(--accent-color), #1976D2);
+            color: white;
+            border: none;
+            padding: clamp(6px, 1.5vh, 10px) clamp(20px, 3vw, 30px);
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: bold;
+            min-height: 36px;
+            touch-action: manipulation;
+        }
+        
+        .next-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(33, 150, 243, 0.3);
+        }
+        
+        /* Rules Screen */
+        #rules-screen {
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.9);
+            overflow-y: auto;
+            height: 100%;
+        }
+        
+        .rules-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: clamp(15px, 3vh, 25px) clamp(15px, 3vw, 25px) clamp(5px, 1vh, 10px);
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .rules-header {
+            text-align: center;
+            margin-bottom: clamp(8px, 1.5vh, 12px);
+        }
+        
+        .rules-header h1 {
+            font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.3;
+        }
+        
+        .start-adventure-container-below-name {
+            text-align: center;
+            margin-top: clamp(15px, 2vh, 20px);
+            margin-bottom: clamp(10px, 1.5vh, 15px);
+        }
+        
+        .game-rules {
+            background-color: rgba(76, 175, 80, 0.1);
+            border-radius: 15px;
+            padding: clamp(12px, 2.5vh, 18px);
+            margin-bottom: clamp(12px, 2vh, 20px);
+            border-left: 5px solid var(--primary-color);
+        }
+        
+        .game-rules h2 {
+            color: var(--primary-color);
+            margin-bottom: clamp(8px, 1.5vh, 12px);
+            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+        }
+        
+        .game-rules ul {
+            list-style-type: none;
+            padding-left: clamp(5px, 1vw, 10px);
+        }
+        
+        .game-rules li {
+            margin-bottom: clamp(6px, 1.5vh, 10px);
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            display: flex;
+            align-items: flex-start;
+            line-height: 1.5;
+        }
+        
+        .player-setup {
+            background-color: rgba(33, 150, 243, 0.1);
+            border-radius: 15px;
+            padding: clamp(12px, 2.5vh, 18px);
+            margin-bottom: 0;
+            border-left: 5px solid var(--accent-color);
+            text-align: center;
+        }
+        
+        .player-setup h2 {
+            color: var(--accent-color);
+            margin-bottom: clamp(8px, 1.5vh, 12px);
+            font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+        }
+        
+        .player-setup label {
+            display: block;
+            margin-bottom: clamp(6px, 1.5vh, 10px);
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: var(--dark-color);
+        }
+        
+        .player-setup input {
+            padding: clamp(8px, 1.5vh, 12px) clamp(12px, 2vw, 18px);
+            border-radius: 25px;
+            border: 2px solid var(--accent-color);
+            width: min(80%, 300px);
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            text-align: center;
+            outline: none;
+            transition: all 0.3s;
+            min-height: 44px;
+        }
+        
+        .player-setup input:focus {
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+            border-color: var(--primary-color);
+        }
+        
+        #name-warning {
+            color: var(--error-color);
+            display: none;
+            font-size: 0.9rem;
+            margin-top: clamp(4px, 1vh, 6px);
+        }
+        
+        .rules-footer {
+            text-align: center;
+            padding: clamp(5px, 1vh, 8px) 0;
+            margin: 0;
+            background: transparent;
+            box-shadow: none;
+            flex-shrink: 0;
+        }
+        
+        .game-start-btn {
+            background: linear-gradient(135deg, var(--primary-color), #45a049);
+            color: white;
+            border: none;
+            padding: clamp(6px, 1.5vh, 10px) clamp(20px, 3vw, 30px);
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            font-weight: bold;
+            min-height: 36px;
+            touch-action: manipulation;
+        }
+        
+        .game-start-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            #creator-banner {
+                padding: clamp(1px, 0.3vh, 3px) clamp(3px, 0.8vw, 6px);
+            }
+            
+            #creator-banner img {
+                max-width: 92vw;
+                max-height: min(65vh, 500px);
+            }
+            
+            .start-btn {
+                padding: clamp(6px, 1.2vh, 10px) clamp(20px, 3vw, 30px);
+                font-size: clamp(0.8rem, 1.8vw, 1rem);
+                min-height: 36px;
+            }
+            
+            .start-adventure-container-below-name {
+                margin-top: clamp(12px, 1.8vh, 16px);
+                margin-bottom: clamp(8px, 1.2vh, 12px);
+            }
+            
+            .game-start-btn {
+                padding: clamp(4px, 1vh, 8px) clamp(15px, 2.5vw, 25px);
+                font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+                min-height: 32px;
+                letter-spacing: 1px;
+            }
+            
+            .feature-card {
+                min-height: 60px;
+                padding: clamp(5px, 1vh, 8px);
+            }
+            
+            .feature-icon {
+                font-size: clamp(0.9rem, 2.2vw, 1.3rem);
+                margin-bottom: clamp(2px, 0.5vh, 4px);
+            }
+            
+            .feature-title {
+                font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+                margin-bottom: clamp(2px, 0.3vh, 3px);
+            }
+            
+            .feature-description {
+                font-size: clamp(0.6rem, 1.1vw, 0.75rem);
+                line-height: 1.2;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #creator-banner {
+                padding: 1px clamp(2px, 0.5vw, 4px);
+            }
+            
+            #creator-banner img {
+                max-width: 94vw;
+                max-height: min(60vh, 450px);
+            }
+            
+            .start-btn {
+                padding: clamp(5px, 1vh, 8px) clamp(18px, 2.5vw, 25px);
+                font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+                min-height: 32px;
+            }
+            
+            .welcome-footer {
+                padding: 2px 0;
+                margin: 0;
+                background: transparent;
+                box-shadow: none;
+            }
+            
+            .next-btn {
+                padding: clamp(3px, 0.8vh, 6px) clamp(12px, 2vw, 20px);
+                font-size: clamp(0.65rem, 1.5vw, 0.8rem);
+                min-height: 28px;
+                letter-spacing: 0.8px;
+            }
+            
+            .start-adventure-container-below-name {
+                margin-top: clamp(10px, 1.5vh, 14px);
+                margin-bottom: clamp(6px, 1vh, 10px);
+            }
+            
+            .game-start-btn {
+                padding: clamp(3px, 0.8vh, 6px) clamp(12px, 2vw, 20px);
+                font-size: clamp(0.65rem, 1.5vw, 0.8rem);
+                min-height: 28px;
+                letter-spacing: 0.8px;
+            }
+            
+            .feature-card {
+                min-height: 50px;
+                padding: clamp(4px, 0.8vh, 6px);
+            }
+            
+            .feature-icon {
+                font-size: clamp(0.8rem, 2vw, 1.2rem);
+                margin-bottom: clamp(2px, 0.4vh, 3px);
+            }
+            
+            .feature-title {
+                font-size: clamp(0.65rem, 1.3vw, 0.8rem);
+                margin-bottom: clamp(1px, 0.2vh, 2px);
+            }
+            
+            .feature-description {
+                font-size: clamp(0.55rem, 1vw, 0.7rem);
+                line-height: 1.1;
+            }
+        }
+        
+        @media (orientation: landscape) and (max-height: 600px) {
+            #creator-banner {
+                padding: 1px 3px;
+            }
+            
+            #creator-banner img {
+                max-width: 60vw;
+                max-height: 75vh;
+            }
+            
+            .start-btn {
+                padding: clamp(4px, 0.8vh, 6px) clamp(15px, 2.5vw, 20px);
+                font-size: clamp(0.7rem, 1.2vw, 0.8rem);
+                min-height: 28px;
+            }
+            
+            .welcome-footer {
+                padding: 2px 0;
+                margin: 0;
+                background: transparent;
+                box-shadow: none;
+            }
+            
+            .next-btn {
+                padding: clamp(2px, 0.6vh, 5px) clamp(10px, 2vw, 16px);
+                font-size: clamp(0.6rem, 1.2vw, 0.75rem);
+                min-height: 24px;
+                letter-spacing: 0.6px;
+            }
+            
+            .start-adventure-container {
+                margin-bottom: clamp(8px, 1.2vh, 12px);
+                margin-top: clamp(5px, 0.8vh, 8px);
+            }
+            
+            .game-start-btn {
+                padding: clamp(2px, 0.6vh, 5px) clamp(10px, 2vw, 16px);
+                font-size: clamp(0.6rem, 1.2vw, 0.75rem);
+                min-height: 24px;
+                letter-spacing: 0.6px;
+            }
+            
+            .feature-card {
+                min-height: 50px;
+                padding: clamp(4px, 0.8vh, 6px);
+            }
+            
+            .feature-icon {
+                font-size: clamp(0.8rem, 2vw, 1.2rem);
+                margin-bottom: clamp(2px, 0.3vh, 3px);
+            }
+            
+            .feature-title {
+                font-size: clamp(0.65rem, 1.2vw, 0.8rem);
+                margin-bottom: clamp(1px, 0.2vh, 2px);
+            }
+            
+            .feature-description {
+                font-size: clamp(0.55rem, 1vw, 0.7rem);
+                line-height: 1.1;
+            }
+            
+            .welcome-content,
+            .rules-content {
+                padding: 1.5vh 2vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Creator Banner Screen -->
+        <div id="creator-banner" class="screen active">
+            <img src="/activity/Start.jpeg" alt="Game Credits">
+            <button class="start-btn" onclick="showWelcomeScreen()">Start Game</button>
+        </div>
+        
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="screen">
+            <div class="welcome-content">
+                <div class="welcome-header">
+                    <h1>Mathematics Masters: Lead the Way</h1>
+                </div>
+                
+                <section class="game-introduction">
+                    <h2>Rabbit's Mathematical Journey</h2>
+                    <p>Help our brave rabbit navigate home by solving mathematical challenges!</p>
+                    
+                </section>
+                
+                <section class="game-features">
+                    <div class="feature-card top-row">
+                        <div class="feature-icon">🧮</div>
+                        <h3 class="feature-title">Maths Genius</h3>
+                        <p class="feature-description">Solve exciting maths problems with increasing difficulty!</p>
+                    </div>
+                    
+                    <div class="feature-card top-row">
+                        <div class="feature-icon">🟢</div>
+                        <h3 class="feature-title">Special Green Stones</h3>
+                        <p class="feature-description">Challenge yourself with unique, complex mathematics!</p>
+                    </div>
+                    
+                    <div class="feature-card bottom-row">
+                        <div class="feature-icon">⏱️</div>
+                        <h3 class="feature-title">Beat the Clock</h3>
+                        <p class="feature-description">Think quickly! Solve problems before time runs out!</p>
+                    </div>
+                    
+                    <div class="feature-card bottom-row">
+                        <div class="feature-icon">🏆</div>
+                        <h3 class="feature-title">Compete for High Scores</h3>
+                        <p class="feature-description">Compete with your friends in real-time!</p>
+                    </div>
+                </section>
+                
+                <div class="welcome-footer">
+                    <button class="next-btn" onclick="showRulesScreen()">View Rules & Start</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rules Screen -->
+        <div id="rules-screen" class="screen">
+            <div class="rules-content">
+                <div class="rules-header">
+                    <h1>Mathematics Masters: Lead the Way</h1>
+                </div>
+                
+                <section class="game-rules">
+                    <h2>Game Rules</h2>
+                    <ul>
+                        <li>Help the rabbit cross the river by jumping from stone to stone. Each stone is a challenge!</li>
+                        <li>➕ Solve problems with positive and negative numbers. Be the maths hero!</li>
+                        <li>🟢 Special green stones have more challenging math problems. Solve them to skip ahead!</li>
+                        <li>⏰ Race against time! Guide your rabbit to the forest before the clock runs out.</li>
+                        <li>❌ Wrong answers send our rabbit back to shore! Think carefully before you leap.</li>
+                        <li>⬅️ Click on the Main Menu if you are willing to exit the game.</li>
+                    </ul>
+                </section>
+                
+                <section class="player-setup">
+                    <h2>Player Setup</h2>
+                    <label for="playerName">Enter Your Name</label>
+                    <input type="text" id="playerName" placeholder="Your Name" maxlength="15" minlength="3">
+                    <div id="name-warning">Please enter your name (minimum 3 characters)!</div>
+                    <div class="start-adventure-container-below-name">
+                        <button class="game-start-btn" onclick="startGame()">Start Adventure</button>
+                    </div>
+                </section>
+            </div>
+            
+            <div class="rules-footer">
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showWelcomeScreen() {
+            document.getElementById('creator-banner').classList.remove('active');
+            document.getElementById('welcome-screen').classList.add('active');
+        }
+        
+        function showRulesScreen() {
+            document.getElementById('welcome-screen').classList.remove('active');
+            document.getElementById('rules-screen').classList.add('active');
+        }
+        
+        function startGame() {
+            const playerNameInput = document.getElementById('playerName');
+            const playerName = playerNameInput.value.trim();
+            const nameWarning = document.getElementById('name-warning');
+            
+            if (playerName.length < 3) {
+                nameWarning.style.display = 'block';
+                playerNameInput.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    playerNameInput.style.animation = '';
+                }, 500);
+                return;
+            }
+            
+            nameWarning.style.display = 'none';
+            localStorage.setItem('playerName', playerName);
+            window.location.href = './activity/game.html';
+        }
+        
+        document.getElementById('playerName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                startGame();
+            }
+        });
+    </script>
+</body>
+</html>

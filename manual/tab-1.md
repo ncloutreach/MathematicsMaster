@@ -1,0 +1,1 @@
+The objective of the game is to strengthen children’s understanding of addition and subtraction involving positive and negative numbers in an engaging and playful manner. By guiding the rabbit to reach its home in the forest, students develop arithmetic fluency while enjoying a game-based learning experience.

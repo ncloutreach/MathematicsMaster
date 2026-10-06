@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathematics Masters: Lead the Way-Game Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            background: #87CEEB;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            height: 100vh;
+            margin: 0;
+            padding: clamp(5px, 1vh, 10px);
+            overflow: hidden;
+            position: relative;
+            gap: clamp(5px, 1vh, 10px);
+        }
+        
+        h1 {
+            color: #333;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin: 0;
+            font-size: clamp(0.9rem, 2.5vw, 1.3rem);
+            text-align: center;
+            padding: 0 10px;
+            flex-shrink: 0;
+        }
+
+        #game-container {
+            width: min(80vw, 900px);
+            height: min(65vh, 550px);
+            max-width: 85vw;
+            max-height: 40vh;
+            flex: 1;
+            position: relative;
+            background: #4BA3C3;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            min-height: 0;
+            aspect-ratio: 16 / 10;
+        }
+
+        .water-animation {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(65, 155, 185, 0.5) 0%,
+                rgba(65, 155, 185, 0.5) 25%,
+                rgba(103, 178, 216, 0.5) 25%,
+                rgba(103, 178, 216, 0.5) 50%
+            );
+            background-size: 60px 60px;
+            animation: flowingWater 20s linear infinite;
+        }
+
+        @keyframes flowingWater {
+            0% {
+                transform: translateX(0) translateY(0);
+            }
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        .stone {
+            width: clamp(80px, 10vw, 120px);
+            height: clamp(50px, 7vh, 80px);
+            position: absolute;
+            background: #808080;
+            border-radius: 45px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            transition: transform 0.3s, opacity 0.5s;
+            opacity: 0.7;
+            font-size: clamp(16px, 2vw, 25px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        
+        .stone.accessible {
+            opacity: 1;
+            cursor: pointer;
+        }
+        
+        .stone:hover.accessible {
+            transform: scale(1.1);
+        }
+        
+        .green-stone {
+            background: #4CAF50;
+        }
+        
+        .green-stone.faded {
+            opacity: 0.4;
+        }
+        
+        #rabbit {
+            width: clamp(40px, 5vw, 60px);
+            height: clamp(40px, 5vw, 60px);
+            position: absolute;
+            transition: all 0.5s ease;
+            z-index: 2;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            font-size: clamp(25px, 4vw, 40px);
+            user-select: none;
+        }
+        
+        #forest {
+            width: clamp(150px, 22vw, 270px);
+            height: clamp(100px, 20vh, 180px);
+            position: absolute; 
+            top: clamp(30px, 5vh, 50px);
+            right: clamp(15px, 2vw, 25px);
+            background: #228B22;
+            border: 3px solid #006400;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: clamp(16px, 2vw, 24px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 1;
+            /* Decorative tree-like elements */
+            background-image: 
+                radial-gradient(circle at 30% 40%, #145214 10px, transparent 10px),
+                radial-gradient(circle at 70% 30%, #145214 15px, transparent 15px),
+                radial-gradient(circle at 50% 50%, #145214 20px, transparent 20px),
+                radial-gradient(circle at 20% 60%, #145214 12px, transparent 12px),
+                radial-gradient(circle at 80% 70%, #145214 14px, transparent 14px);
+        }
+        
+        /* Addition: Land area under the forest */
+        #forest-land {
+            width: clamp(180px, 32vw, 320px);
+            height: clamp(35px, 7vh, 55px);
+            position: absolute;
+            top: clamp(150px, 26vh, 230px);
+            right: 0;
+            background: #8B4513;
+            border-radius: 0 0 0 50%;
+            z-index: 0;
+        }
+        
+        /* Addition: Grass on the land */
+        .grass {
+            position: absolute;
+            background: #3A5F0B;
+            width: 100%;
+            height: 15px;
+            top: 0;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        
+        #question-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: clamp(15px, 3vw, 25px);
+            border-radius: 15px;
+            display: none;
+            z-index: 1001;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            font-size: clamp(14px, 2vw, 18px);
+            width: min(90vw, 400px);
+            max-height: 80vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        #score-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: clamp(20px, 4vw, 40px);
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+            z-index: 1002;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+            width: min(90vw, 400px);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        #score-modal h2 {
+            color: #4CAF50;
+            font-size: clamp(1.5em, 5vw, 2.5em);
+            margin-bottom: clamp(15px, 3vh, 20px);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        #score-display {
+            font-size: clamp(1.5em, 4vw, 2em);
+            font-weight: bold;
+            color: #333;
+            margin: clamp(15px, 3vh, 20px) 0;
+            padding: clamp(10px, 2vh, 15px);
+            background: #f8f8f8;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        #timer-container {
+            position: absolute;
+            top: clamp(15px, 3vh, 30px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: clamp(8px, 1.5vh, 10px) clamp(15px, 2vw, 25px);
+            border-radius: 30px;
+            border: 2px solid #fff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        #timer {
+            color: white;
+            font-size: clamp(20px, 3vw, 32px);
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        #timer-label {
+            color: white;
+            font-size: clamp(12px, 1.5vw, 16px);
+            margin-top: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        #scorecard {
+            position: absolute;
+            top: clamp(15px, 3vh, 30px);
+            left: clamp(15px, 2vw, 30px);
+            background: rgba(255, 255, 255, 0.9);
+            padding: clamp(10px, 2vw, 20px);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+
+        #scorecard h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: clamp(14px, 2vw, 18px);
+        }
+
+        #scorecard p {
+            margin: 5px 0;
+            font-size: clamp(12px, 1.5vw, 16px);
+        }
+        
+        .stone-label {
+            font-size: clamp(16px, 2vw, 25px);
+            margin-top: 4px;
+        }
+
+        .path {
+            font-size: 18px;
+            color: #333;
+            margin: 15px 0;
+        }
+
+        #answer-input {
+            font-size: clamp(16px, 2.5vw, 18px);
+            padding: clamp(10px, 1.5vh, 12px);
+            margin: clamp(10px, 2vh, 15px) 0;
+            width: min(40vw, 150px);
+            border: 2px solid #4BA3C3;
+            border-radius: 8px;
+            text-align: center;
+            min-height: 44px;
+        }
+
+        button {
+            padding: clamp(10px, 2vh, 12px) clamp(18px, 3vw, 24px);
+            font-size: clamp(14px, 2vw, 16px);
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            min-height: 44px;
+            touch-action: manipulation;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+        
+        #hint-btn {
+            background: #2196F3;
+        }
+        
+        #hint-btn:hover {
+            background: #0b7dda;
+        }
+        
+        #hint-text {
+            margin-top: 10px;
+            color: #2196F3;
+            font-style: italic;
+            display: none;
+        }
+        
+        #pause-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: clamp(20px, 4vw, 40px);
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+            z-index: 1005;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            width: min(90vw, 350px);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        #pause-modal h2 {
+            color: #333;
+            font-size: clamp(1.5em, 4vw, 2em);
+            margin-bottom: clamp(15px, 3vh, 20px);
+        }
+
+        #pause-modal p {
+            color: #666;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            margin-bottom: clamp(20px, 3vh, 30px);
+            line-height: 1.5;
+        }
+
+        .pause-button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: clamp(10px, 2vw, 15px);
+            margin-top: clamp(15px, 2vh, 20px);
+        }
+
+        .pause-btn {
+            padding: clamp(10px, 2vh, 14px) clamp(20px, 4vw, 32px);
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: clamp(0.9em, 2vw, 1.1em);
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+
+        .pause-btn:hover {
+            background: #45a049;
+        }
+
+        .resume-btn {
+            background: #2196F3;
+        }
+
+        .resume-btn:hover {
+            background: #0b7dda;
+        }
+        
+        #feedback-message {
+            position: fixed;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: clamp(10px, 2vh, 15px) clamp(20px, 3vw, 30px);
+            border-radius: 15px;
+            display: none;
+            z-index: 1004;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            text-align: center;
+            font-size: clamp(24px, 4vw, 36px);
+            animation: fadeOut 1.5s forwards;
+        }
+
+        /* Animation for rabbit jump */
+        @keyframes rabbitJump {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-150px) scale(1.2); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        #navigation {
+            margin: 0;
+            display: flex;
+            flex-wrap: nowrap;
+            gap: clamp(8px, 1.5vw, 12px);
+            justify-content: center;
+            padding: 0 10px;
+            flex-shrink: 0;
+        }
+        
+        /* Mobile and Responsive Adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: clamp(3px, 0.5vh, 5px);
+                gap: clamp(3px, 0.5vh, 8px);
+            }
+            
+            h1 {
+                font-size: clamp(0.85rem, 2.2vw, 1.1rem);
+            }
+            
+            #game-container {
+                width: 80vw;
+                height: 40vh;
+                max-height: 60vh;
+                border-radius: 0;
+                aspect-ratio: 16 / 10;
+            }
+            
+            #question-modal h3 {
+                font-size: clamp(1.1rem, 3vw, 1.3rem);
+            }
+            
+            .button-container {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .button-container button,
+            .button-container .btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: clamp(2px, 0.3vh, 4px);
+            }
+            
+            h1 {
+                font-size: clamp(0.8rem, 2vw, 1rem);
+            }
+            
+            #game-container {
+                height: 35vh;
+                max-height: 45vh;
+            }
+            
+            #rabbit {
+                width: clamp(32px, 6vw, 45px);
+                height: clamp(32px, 6vw, 45px);
+                font-size: clamp(20px, 4vw, 30px);
+            }
+            
+            #forest {
+                width: clamp(120px, 28vw, 200px);
+                height: clamp(80px, 18vh, 140px);
+                font-size: clamp(14px, 2.5vw, 18px);
+            }
+            
+            #forest-land {
+                width: clamp(120px, 25vw, 180px);
+                height: clamp(25px, 5vh, 40px);
+            }
+            
+            #scorecard {
+                padding: clamp(8px, 1.5vw, 12px);
+            }
+            
+            #scorecard h3 {
+                font-size: clamp(12px, 2vw, 14px);
+                margin-bottom: 5px;
+            }
+            
+            #scorecard p {
+                font-size: clamp(10px, 1.5vw, 12px);
+                margin: 3px 0;
+            }
+            
+            #timer-container {
+                padding: clamp(6px, 1vh, 8px) clamp(12px, 2vw, 18px);
+            }
+        }
+        
+        @media (orientation: landscape) and (max-height: 600px) {
+            body {
+                padding: 2px;
+                gap: 3px;
+            }
+            
+            h1 {
+                font-size: 0.75rem;
+            }
+            
+            #game-container {
+                height: 50vh;
+                max-height: 60vh;
+                aspect-ratio: 16 / 9;
+            }
+            
+            #navigation {
+                padding: 0 5px;
+            }
+        }
+        
+        @media (min-width: 1400px) {
+            #game-container {
+                height: min(50vh, 500px);
+                max-height: 60vh;
+            }
+        }
+        
+        #navigation button {
+            padding: clamp(10px, 2vh, 14px) clamp(20px, 4vw, 32px);
+            background: #F44336;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: clamp(0.9em, 2vw, 1.1em);
+            transition: background-color 0.3s;
+            border: none;
+            cursor: pointer;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+        
+        #navigation button:hover {
+            background: #D32F2F;
+        }
+        
+        .btn {
+            padding: clamp(10px, 2vh, 14px) clamp(20px, 4vw, 32px);
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: clamp(0.9em, 2vw, 1.1em);
+            transition: background-color 0.3s;
+            display: inline-block;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+        
+        .btn:hover {
+            background: #45a049;
+        }
+        
+        .exit-btn {
+            background: #F44336;
+        }
+        
+        .exit-btn:hover {
+            background: #D32F2F;
+        }
+    </style>
+</head>
+<body>
+    <!-- Score Modal -->
+    <div id="score-modal">
+        <h2>Congratulations! 🎉</h2>
+        <div>You've completed the game with a score of:</div>
+        <div id="score-display">0/0</div>
+    </div>
+    
+    <div id="game-container">
+        <div class="water-animation"></div>
+        <div id="forest-land">
+            <div class="grass"></div>
+        </div>
+        <div id="forest">Forest</div>
+        <div id="sun"></div>
+        <div id="timer-container">
+            <div id="timer">90</div>
+            <div id="timer-label">seconds left</div>
+        </div>
+        <div id="scorecard">
+            <h3>Score</h3>
+            <p>Correct Answers: <span id="correct-answers">0</span></p>
+            <p>Attempts: <span id="total-attempts">0</span></p>
+            <p id="value-output">User: </span></p>
+        </div>
+        <div id="rabbit">🐰</div>
+    </div>
+    
+    <div id="question-modal">
+        <h3>Solve this:</h3>
+        <p id="question-text"></p>
+        <p id="path-text" class="path"></p>
+        <input type="number" id="answer-input">
+        <div class="button-container">
+            <button onclick="checkAnswer()">Submit</button>
+            <button id="hint-btn" onclick="showHint()">Hint</button>
+        </div>
+        <p id="hint-text"></p>
+    </div>
+    
+    <div id="feedback-message"></div>
+    
+    <div id="pause-modal">
+        <h2>Game Paused</h2>
+        <p>Do you want to continue playing or exit the game?</p>
+        <div class="pause-button-container">
+            <button class="pause-btn" onclick="closePauseModal()">OK</button>
+            <button class="resume-btn" onclick="resumeGame()">Resume</button>
+        </div>
+    </div>
+
+    <!-- Fireworks container -->
+    <div id="fireworks-container" style="display:none; position:fixed; left:0; top:0; width:400vw; height:100vh; pointer-events:none; z-index:9999;"></div>
+
+    <div id="navigation">
+        <a href="index.html" class="btn">Main Menu</a>
+        <button id="exit-game-btn" onclick="showExitModal()">Exit Game</button>
+    </div>
+    
+    <script>
+        // End Credits button functionality
+        const endImageModal = document.getElementById('endImageModal');
+        const endCreditsBtn = document.getElementById('endCreditsBtn');
+        const closeEndImage = document.getElementById('closeEndImage');
+        
+        if (endCreditsBtn && endImageModal && closeEndImage) {
+            // When user clicks the End Credits button, open the modal
+            endCreditsBtn.onclick = function() {
+                endImageModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+            }
+            
+            // When user clicks on (x), close the modal
+            closeEndImage.onclick = function() {
+                endImageModal.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Re-enable scrolling
+            }
+            
+            // When user clicks anywhere outside of the modal, close it
+            window.onclick = function(event) {
+                if (event.target == endImageModal) {
+                    endImageModal.style.display = 'none';
+                    document.body.style.overflow = 'auto'; // Re-enable scrolling
+                }
+            }
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && endImageModal.style.display === 'flex') {
+                    endImageModal.style.display = 'none';
+                    document.body.style.overflow = 'auto'; // Re-enable scrolling
+                }
+            });
+        }
+        
+        //location of each stone (using percentage for responsive positioning)
+        const stones = [
+            { x: '3%', y: '78%', value: -4, label: 'A' },
+            { x: '18%', y: '78%', value: 4, label: 'B' },
+            { x: '33%', y: '78%', value: -11, label: 'C', isGreen: true },
+            { x: '48%', y: '78%', value: 22, label: 'D' },
+            { x: '63%', y: '78%', value: -7, label: 'E' },
+            { x: '78%', y: '67%', value: -11, label: 'F', isGreen: true },
+            { x: '63%', y: '56%', value: 8, label: 'G' },
+            { x: '48%', y: '56%', value: -17, label: 'H', isGreen: true },
+            { x: '33%', y: '56%', value: 10, label: 'I' },
+            { x: '18%', y: '56%', value: 10, label: 'J' },
+            { x: '3%', y: '44%', value: -11, label: 'K', isGreen: true },
+            { x: '18%', y: '38%', value: 5, label: 'L' },
+            { x: '33%', y: '38%', value: -9, label: 'M', isGreen: true },
+            { x: '48%', y: '38%', value: 12, label: 'N' }
+        ];
+    
+        let currentStone = -1;
+        let gameTimer;
+        let timeLeft = 90;
+        let correctAnswers = 0;
+        let totalAttempts = 0;
+        let stoneElements = [];
+        let fadedGreenStones = [];
+        const rabbitEmojis = {
+            normal: "🐰",
+            happy: "🐰😊",
+            sad: "🐰😢"
+        };
+        
+        // Define forest position for rabbit jump (percentage-based)
+        const forestPosition = {
+            x: '85%',  // Right side of the game area (moved closer to edge)
+            y: '16%'   // Top of the game area
+        };
+    
+        function initGame() {
+            const playerName = localStorage.getItem('playerName') || 'Guest';
+            document.getElementById('value-output').textContent = `User: ${playerName}`;
+            stones.forEach((stone, index) => {
+                const stoneElement = document.createElement('div');
+                stoneElement.className = `stone ${stone.isGreen ? 'green-stone' : ''}`;
+                stoneElement.style.left = stone.x;
+                stoneElement.style.top = stone.y;
+                stoneElement.innerHTML = `${stone.value} <div class="stone-label">${stone.label}</div>`;
+                stoneElement.onclick = () => handleStoneClick(index);
+                document.getElementById('game-container').appendChild(stoneElement);
+                stoneElements.push(stoneElement);
+            });
+    
+            resetRabbitPosition();
+            updateAccessibleStones();
+            startTimer();
+            updateScorecard();
+    
+            document.getElementById('answer-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+
+            // Add pause functionality with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    showPauseModal();
+                }
+            });
+        }
+    
+        function updateScorecard() {
+            document.getElementById('correct-answers').textContent = correctAnswers;
+            document.getElementById('total-attempts').textContent = totalAttempts;
+        }
+    
+        function updateAccessibleStones() {
+            stoneElements.forEach((element, index) => {
+                if (isStoneAccessible(index)) {
+                    element.classList.add('accessible');
+                } else {
+                    element.classList.remove('accessible');
+                }
+            });
+        }
+    
+        function isStoneAccessible(index) {
+            if (currentStone === -1 && index === 0) return true;
+            return currentStone !== -1 && index === currentStone + 1;
+        }
+    
+        function startTimer() {
+            clearInterval(gameTimer);
+            gameTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = timeLeft;
+    
+                if (timeLeft <= 0) {
+                    clearInterval(gameTimer);
+                    showEndMessage("Time's up! The rabbit couldn't reach the forest on time.", false);
+                }
+            }, 1000);
+        }
+    
+        function handleStoneClick(index) {
+            if (!isStoneAccessible(index)) return;
+    
+            const stone = stones[index];
+            const modal = document.getElementById('question-modal');
+            const questionText = document.getElementById('question-text');
+            const pathText = document.getElementById('path-text');
+            const hintText = document.getElementById('hint-text');
+    
+            // Reset hint
+            hintText.style.display = 'none';
+            hintText.textContent = '';
+    
+            if (stone.isGreen) {
+                const puzzle = generateGreenStonePuzzle();
+                questionText.textContent = puzzle.question;
+                pathText.textContent = '';
+                modal.dataset.expectedAnswer = puzzle.answer;
+                modal.dataset.targetStone = index;
+                modal.dataset.isGreen = "true";
+                modal.dataset.hint = puzzle.hint;
+            } else {
+                const puzzle = generateNormalStonePuzzle(currentStone, index);
+                questionText.textContent = puzzle.question;
+                pathText.textContent = `Path: ${puzzle.path}`;
+                modal.dataset.expectedAnswer = puzzle.answer;
+                modal.dataset.targetStone = index;
+                modal.dataset.isGreen = "false";
+                modal.dataset.hint = puzzle.hint;
+            }
+    
+            modal.style.display = 'block';
+            document.getElementById('answer-input').value = '';
+            document.getElementById('answer-input').focus();
+        }
+    
+        function generateNormalStonePuzzle(from, to) {
+            // Generate more complex expressions for normal stones
+            if (from === -1) {
+                // First stone(reference)
+                const a = Math.floor(Math.random() * 10) + 1;
+                const b = Math.floor(Math.random() * 10) + 1;
+                return {
+                    question: `What is the sum of the path plus ${a}×${b}?`,
+                    path: `${stones[to].value}`,
+                    answer: stones[to].value + (a * b),
+                    hint: `Calculate ${a}×${b} = ${a*b}, then add it to ${stones[to].value}`
+                };
+            } else {
+                // More complex expressions for subsequent normal stones
+                const operations = [
+                    {
+                        op: '+',
+                        calc: (a, b) => a + b
+                    },
+                    {
+                        op: '×',
+                        calc: (a, b) => a * b
+                    },
+                    {
+                        op: '-',
+                        calc: (a, b) => a - b
+                    }
+                ];
+                
+                const randomOp = operations[Math.floor(Math.random() * operations.length)];
+                const a = Math.floor(Math.random() * 10) + 1;
+                
+                const pathSum = stones[from].value + stones[to].value;
+                const answer = randomOp.calc(pathSum, a);
+                
+                return {
+                    question: `What is the sum of the path ${randomOp.op} ${a}?`,
+                    path: `${stones[from].value} + ${stones[to].value}`,
+                    answer: answer,
+                    hint: `First calculate the path sum: ${stones[from].value} + ${stones[to].value} = ${pathSum}, then ${pathSum} ${randomOp.op} ${a} = ${answer}`
+                };
+            }
+        }
+    
+        function generateGreenStonePuzzle() {
+            // Generate more challenging mathematical problems for green stones
+            const problemTypes = [
+                // Type 1: Arithmetic with multiple operations(for normal stones )
+                () => {
+                    const a = Math.floor(Math.random() * 20) + 5;
+                    const b = Math.floor(Math.random() * 10) + 2;
+                    const c = Math.floor(Math.random() * 15) + 3;
+                    return {
+                        question: `${a} + ${b} × ${c} = _`,
+                        answer: a + (b * c),
+                        hint: `Remember to multiply first, then add: ${b} × ${c} = ${b*c}, then ${a} + ${b*c} = ${a+(b*c)}`
+                    };
+                },
+                
+                // Type 2: Quadratic expression(for green stones )
+                () => {
+                    const a = Math.floor(Math.random() * 5) + 2;
+                    return {
+                        question: `${a}² + ${a} = _`,
+                        answer: (a * a) + a,
+                        hint: `${a}² means ${a} squared (${a} × ${a}), which is ${a*a}. Then add ${a} to get ${(a*a)+a}`
+                    };
+                },
+                
+                // Type 3: Subtraction with multiplication
+                () => {
+                    const a = Math.floor(Math.random() * 15) + 10;
+                    const b = Math.floor(Math.random() * 5) + 2;
+                    const c = Math.floor(Math.random() * 3) + 2;
+                    return {
+                        question: `${a} - ${b} × ${c} = _`,
+                        answer: a - (b * c),
+                        hint: `Multiply first: ${b} × ${c} = ${b*c}, then subtract from ${a}: ${a} - ${b*c} = ${a-(b*c)}`
+                    };
+                },
+                
+                // Type 4: Division with addition
+                () => {
+                    const b = Math.floor(Math.random() * 5) + 2;
+                    const a = b * (Math.floor(Math.random() * 5) + 2); // Ensure clean division
+                    const c = Math.floor(Math.random() * 10) + 1;
+                    return {
+                        question: `${a} ÷ ${b} + ${c} = _`,
+                        answer: (a / b) + c,
+                        hint: `Divide first: ${a} ÷ ${b} = ${a/b}, then add ${c}: ${a/b} + ${c} = ${(a/b)+c}`
+                    };
+                },
+                
+                // Type 5: Parentheses
+                () => {
+                    const a = Math.floor(Math.random() * 10) + 1;
+                    const b = Math.floor(Math.random() * 10) + 1;
+                    const c = Math.floor(Math.random() * 10) + 1;
+                    return {
+                        question: `(${a} + ${b}) × ${c} = _`,
+                        answer: (a + b) * c,
+                        hint: `Calculate inside the parentheses first: ${a} + ${b} = ${a+b}, then multiply by ${c}: ${a+b} × ${c} = ${(a+b)*c}`
+                    };
+                }
+            ];
+            
+            const selectedProblemType = problemTypes[Math.floor(Math.random() * problemTypes.length)];
+            return selectedProblemType();
+        }
+    
+        function showHint() {
+            const modal = document.getElementById('question-modal');
+            const hintText = document.getElementById('hint-text');
+            hintText.textContent = modal.dataset.hint;
+            hintText.style.display = 'block';
+        }
+    
+        function showFeedbackMessage(isCorrect) {
+            const feedbackMsg = document.getElementById('feedback-message');
+            feedbackMsg.textContent = isCorrect ? "Correct! 😊" : "Wrong answer! 😢";
+            feedbackMsg.style.backgroundColor = isCorrect ? "rgba(76, 175, 80, 0.9)" : "rgba(255, 87, 34, 0.9)";
+            feedbackMsg.style.display = 'block';
+            document.getElementById('rabbit').textContent = isCorrect ? rabbitEmojis.happy : rabbitEmojis.sad;
+            setTimeout(() => {
+                feedbackMsg.style.display = 'none';
+                if (!isCorrect) {
+                    setTimeout(() => {
+                        document.getElementById('rabbit').textContent = rabbitEmojis.normal;
+                    }, 500);
+                }
+            }, 1500);
+        }
+    
+        function checkAnswer() {
+            const modal = document.getElementById('question-modal');
+            const userAnswer = parseInt(document.getElementById('answer-input').value);
+            const expectedAnswer = parseInt(modal.dataset.expectedAnswer);
+            const targetStone = parseInt(modal.dataset.targetStone);
+            const isGreen = modal.dataset.isGreen === "true";
+    
+            totalAttempts++;
+    
+            if (userAnswer === expectedAnswer) {
+                correctAnswers++;
+                showFeedbackMessage(true);
+                if (isGreen) {
+                    const nextGreenStone = findNextGreenStone(targetStone);
+                    moveRabbit(nextGreenStone !== -1 ? nextGreenStone : targetStone);
+                } else {
+                    moveRabbit(targetStone);
+                }
+                updateAccessibleStones();
+            } else {
+                showFeedbackMessage(false);
+                if (isGreen) {
+                    stoneElements[targetStone].classList.add('faded');
+                    fadedGreenStones.push(targetStone);
+                }
+                resetRabbitPosition();
+                updateAccessibleStones();
+            }
+    
+            updateScorecard();
+            modal.style.display = 'none';
+        }
+    
+        function findNextGreenStone(currentIndex) {
+            for (let i = currentIndex + 1; i < stones.length; i++) {
+                if (stones[i].isGreen) return i;
+            }
+            return -1;
+        }
+    
+        function moveRabbit(stoneIndex) {
+            if (stoneIndex < stones.length) {
+                const rabbit = document.getElementById('rabbit');
+                const stone = stones[stoneIndex];
+                const stoneElement = stoneElements[stoneIndex];
+    
+                // Get stone position and adjust for rabbit offset
+                const stoneRect = stoneElement.getBoundingClientRect();
+                const containerRect = document.getElementById('game-container').getBoundingClientRect();
+                
+                const rabbitX = ((stoneRect.left - containerRect.left + stoneRect.width / 2 - 30) / containerRect.width) * 100;
+                const rabbitY = ((stoneRect.top - containerRect.top - 40) / containerRect.height) * 100;
+    
+                rabbit.style.left = `${rabbitX}%`;
+                rabbit.style.top = `${rabbitY}%`;
+                currentStone = stoneIndex;
+                setTimeout(() => {
+                    rabbit.textContent = rabbitEmojis.normal;
+                }, 1500);
+            }
+    
+            if (stoneIndex === stones.length - 1) {
+                setTimeout(() => {
+                    jumpToForest();
+                }, 1500);
+            }
+        }
+        
+        // New function to animate rabbit jumping to forest
+        function jumpToForest() {
+            const rabbit = document.getElementById('rabbit');
+            
+            // Re-enable transition with longer duration for the jump
+            rabbit.style.transition = 'all 1.5s cubic-bezier(0.5, -0.5, 0.5, 1.5)';
+            
+            // Make the rabbit jump to forest
+            setTimeout(() => {
+                rabbit.textContent = rabbitEmojis.happy;
+                rabbit.style.left = forestPosition.x;
+                rabbit.style.top = forestPosition.y;
+                rabbit.style.transform = 'scale(1.2)';
+                
+                // Show completion message after jump
+                setTimeout(() => {
+                    clearInterval(gameTimer);
+                    showEndMessage("Thank You for helping me reach the forest safely!", true);
+                    rabbit.style.transform = 'scale(1)';
+                }, 1500);
+            }, 100);
+        }
+    
+        function showEndMessage(message, success) {
+            // Store the score in localStorage
+            const scoreString = `${correctAnswers}/${totalAttempts}`;
+            localStorage.setItem('gameScore', scoreString);
+            localStorage.setItem('gameSuccess', success ? 'true' : 'false');
+            
+            if (success) {
+                // Show score in modal
+                const scoreModal = document.getElementById('score-modal');
+                const scoreDisplay = document.getElementById('score-display');
+                scoreDisplay.textContent = scoreString;
+                scoreModal.style.display = 'block';
+                
+                // Launch fireworks
+                launchFireworks();
+                
+                // Redirect after 4-5 seconds
+                const redirectTime = 4000 + Math.random() * 1000; // Random time between 4-5 seconds
+                setTimeout(() => {
+                    window.location.href = 'end.html';
+                }, redirectTime);
+            } else {
+                // For game over (not success), redirect immediately
+                window.location.href = 'end.html';
+            }
+        }
+    
+        function resetRabbitPosition() {
+            const rabbit = document.getElementById('rabbit');
+            rabbit.style.transition = 'all 0.5s ease';
+            rabbit.style.left = '1%';
+            rabbit.style.top = '65%';
+            rabbit.style.transform = 'scale(1)';
+            rabbit.textContent = rabbitEmojis.normal;
+            currentStone = -1;
+        }
+    
+        function resetGame() {
+            resetRabbitPosition();
+            timeLeft = 90;
+            correctAnswers = 0;
+            totalAttempts = 0;
+            document.getElementById('timer').textContent = timeLeft;
+            
+            // Reset faded green stones
+            fadedGreenStones.forEach(index => {
+                stoneElements[index].classList.remove('faded');
+            });
+            fadedGreenStones = [];
+            
+            updateScorecard();
+            clearInterval(gameTimer);
+            startTimer();
+            updateAccessibleStones();
+            
+            document.getElementById('end-message').style.display = 'none';
+            document.getElementById('feedback-message').style.display = 'none';
+        }
+        
+        function showPauseModal() {
+            const pauseModal = document.getElementById('pause-modal');
+            pauseModal.style.display = 'block';
+            // Pause the game timer
+            clearInterval(gameTimer);
+        }
+
+        function closePauseModal() {
+            const pauseModal = document.getElementById('pause-modal');
+            pauseModal.style.display = 'none';
+            // Resume the game timer
+            startTimer();
+        }
+
+        function showExitModal() {
+            // Show pause modal for exit confirmation
+            showPauseModal();
+
+            // Update modal content for exit confirmation
+            const pauseModal = document.getElementById('pause-modal');
+            const modalTitle = pauseModal.querySelector('h2');
+            const modalMessage = pauseModal.querySelector('p');
+            const okButton = pauseModal.querySelector('.pause-btn');
+            const resumeButton = pauseModal.querySelector('.resume-btn');
+
+            modalTitle.textContent = 'Exit Game?';
+            modalMessage.textContent = 'Are you sure you want to exit the game? Your progress will be saved.';
+            okButton.textContent = 'Exit';
+            okButton.onclick = function() {
+                // Actually exit the game - no alert popup
+                clearInterval(gameTimer);
+
+                // Show current score in modal first
+                const scoreString = `${correctAnswers}/${totalAttempts}`;
+                const playerName = localStorage.getItem('playerName') || 'Guest';
+
+                // Update modal to show score before redirecting
+                modalTitle.textContent = 'Game Exited';
+                modalMessage.innerHTML = `<strong>Player:</strong> ${playerName}<br><br><strong>Current Score:</strong> ${scoreString}<br><br><em>Redirecting to end credits...</em>`;
+
+                // Store score for end.html
+                localStorage.setItem('gameScore', scoreString);
+                localStorage.setItem('gameSuccess', 'false'); // Not a successful completion
+                localStorage.setItem('exitEarly', 'true'); // Flag to indicate early exit
+
+                // Hide buttons since we're exiting
+                okButton.style.display = 'none';
+                resumeButton.style.display = 'none';
+
+                // Redirect after showing score for 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'end.html';
+                }, 2000);
+            };
+            resumeButton.textContent = 'Continue';
+            resumeButton.onclick = function() {
+                // Just close the modal and resume playing
+                closePauseModal();
+            };
+        }
+    
+        // Fireworks celebration
+        function launchFireworks() {
+            const container = document.getElementById('fireworks-container');
+            container.innerHTML = '';
+            container.style.display = 'block';
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => createDiwaliFirework(container), i * 350);
+            }
+            setTimeout(() => { container.style.display = 'none'; }, 4200);
+        }
+
+        function createDiwaliFirework(container) {
+            const centerX = Math.random() * 70 + 15; // vw
+            const centerY = Math.random() * 40 + 10; // vh
+            const colors = [
+                '#FFD700', '#FF4500', '#00BFFF', '#ADFF2F', '#FF69B4', '#FF6347', '#7CFC00', '#FF00FF', '#00FFFF', '#FFA500'
+            ];
+            const numRays = 18 + Math.floor(Math.random() * 8);
+            const fireworkGroup = document.createElement('div');
+            fireworkGroup.style.position = 'absolute';
+            fireworkGroup.style.left = centerX + 'vw';
+            fireworkGroup.style.top = centerY + 'vh';
+            fireworkGroup.style.pointerEvents = 'none';
+            fireworkGroup.style.zIndex = '10000';
+            for (let i = 0; i < numRays; i++) {
+                const ray = document.createElement('div');
+                const angle = (2 * Math.PI * i) / numRays;
+                const length = 80 + Math.random() * 40;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                ray.style.position = 'absolute';
+                ray.style.width = '4px';
+                ray.style.height = length + 'px';
+                ray.style.background = `linear-gradient(${color}, transparent)`;
+                ray.style.left = '-2px';
+                ray.style.top = '-2px';
+                ray.style.transformOrigin = 'center bottom';
+                ray.style.transform = `rotate(${angle * 180 / Math.PI}deg) scaleY(0)`;
+                ray.style.opacity = '0.85';
+                ray.style.borderRadius = '2px';
+                ray.style.animation = 'diwali-ray-burst 1.1s cubic-bezier(0.5,0,0.5,1) forwards';
+                ray.style.animationDelay = (Math.random() * 0.2) + 's';
+                fireworkGroup.appendChild(ray);
+                // Add sparkles at the end
+                setTimeout(() => {
+                    const sparkle = document.createElement('div');
+                    sparkle.style.position = 'absolute';
+                    sparkle.style.left = (Math.sin(angle) * length - 6) + 'px';
+                    sparkle.style.top = (-Math.cos(angle) * length - 6) + 'px';
+                    sparkle.style.width = '12px';
+                    sparkle.style.height = '12px';
+                    sparkle.style.borderRadius = '50%';
+                    sparkle.style.background = color;
+                    sparkle.style.opacity = '0.85';
+                    sparkle.style.boxShadow = `0 0 18px 6px ${color}`;
+                    sparkle.style.animation = 'diwali-sparkle-fade 0.7s linear forwards';
+                    fireworkGroup.appendChild(sparkle);
+                    setTimeout(() => sparkle.remove(), 700);
+                }, 900);
+            }
+            container.appendChild(fireworkGroup);
+            setTimeout(() => { fireworkGroup.remove(); }, 1600);
+        }
+
+        // Add keyframes for Diwali fireworks
+        const style = document.createElement('style');
+        style.innerHTML = `@keyframes diwali-ray-burst {
+            0% { transform: scaleY(0); opacity: 1; }
+            70% { transform: scaleY(1.1); opacity: 1; }
+            100% { transform: scaleY(1); opacity: 0; }
+        }
+        @keyframes diwali-sparkle-fade {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }`;
+        document.head.appendChild(style);
+    
+        window.onload = initGame;
+    </script>
+</body>
+</html

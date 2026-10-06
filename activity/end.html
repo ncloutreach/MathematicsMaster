@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathematics Masters - Game Over</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0 clamp(10px, 2vw, 20px);
+            gap: 2px;
+        }
+        
+        .background-image {
+            width: min(75vw, 550px);
+            height: min(45vh, 450px);
+            background: url('End.jpeg') no-repeat center center / contain;
+            margin: 0 auto;
+            flex-shrink: 0;
+        }
+        
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+            padding: 0;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(10px, 2vw, 20px);
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .play-again-btn {
+            padding: clamp(6px, 1.2vh, 10px) clamp(15px, 2.5vw, 25px);
+            font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 0.6px;
+            min-width: clamp(100px, 20vw, 150px);
+            text-align: center;
+            min-height: 35px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+        
+        .play-again-btn:hover {
+            background: linear-gradient(135deg, #45a049, #3d8b40);
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .exit-btn {
+            padding: clamp(6px, 1.2vh, 10px) clamp(15px, 2.5vw, 25px);
+            font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+            background: linear-gradient(135deg, #F44336, #D32F2F);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 0.6px;
+            min-width: clamp(100px, 20vw, 150px);
+            text-align: center;
+            min-height: 35px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+        
+        .exit-btn:hover {
+            background: linear-gradient(135deg, #D32F2F, #B71C1C);
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        @keyframes fall {
+            to { 
+                transform: translateY(100vh) rotate(360deg); 
+                opacity: 0; 
+            }
+        }
+        
+        /* Score Display */
+        .score-display {
+            background: rgba(255, 255, 255, 0.95);
+            padding: clamp(15px, 3vh, 25px) clamp(20px, 4vw, 35px);
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            margin-bottom: clamp(15px, 3vh, 25px);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .score-display h2 {
+            color: #4CAF50;
+            font-size: clamp(1.3rem, 4vw, 2rem);
+            margin-bottom: clamp(10px, 2vh, 15px);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .score-display p {
+            color: #333;
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            font-weight: bold;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 0 clamp(10px, 2vw, 15px);
+                gap: 1px;
+            }
+            
+            .background-image {
+                width: 85vw;
+                height: min(40vh, 350px);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 0 clamp(8px, 1.5vw, 12px);
+                gap: 1px;
+            }
+            
+            .background-image {
+                width: 80vw;
+                height: min(35vh, 300px);
+            }
+            
+            .button-container {
+                flex-direction: column;
+                gap: clamp(6px, 1.5vh, 12px);
+            }
+            
+            .play-again-btn, .exit-btn {
+                min-width: 75vw;
+                letter-spacing: 0.4px;
+                padding: clamp(5px, 1vh, 8px) clamp(12px, 2vw, 20px);
+                font-size: clamp(0.65rem, 1.5vw, 0.8rem);
+            }
+        }
+        
+        @media (orientation: landscape) and (max-height: 600px) {
+            body {
+                padding: 0 5px;
+                gap: 1px;
+            }
+            
+            .background-image {
+                width: min(50vw, 400px);
+                height: min(55vh, 300px);
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .background-image {
+                width: min(70vw, 650px);
+                height: min(50vh, 500px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="background-image"></div>
+    
+    <div class="content-wrapper">
+        <div class="button-container">
+            <a href="game.html" class="play-again-btn">Play Again</a>
+            <a href="#" class="exit-btn">Exit</a>
+        </div>
+    </div>
+    
+    <script>
+        // Display the score from the game
+        window.onload = function() {
+            const score = localStorage.getItem('gameScore') || '0/0';
+            const success = localStorage.getItem('gameSuccess') === 'true';
+            const scoreDisplay = document.getElementById('score-display');
+            
+            // Add confetti if the game was won
+            if (success) {
+                // Simple confetti effect
+                const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+                for (let i = 0; i < 50; i++) {
+                    createConfetti(colors);
+                }
+            }
+        };
+
+        function createConfetti(colors) {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.width = '10px';
+            confetti.style.height = '10px';
+            confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.top = Math.random() * 100 + 'vh';
+            confetti.style.pointerEvents = 'none';
+            confetti.style.animation = 'fall ' + (Math.random() * 3 + 2) + 's linear forwards';
+            document.body.appendChild(confetti);
+            
+            // Remove confetti after animation
+            setTimeout(() => {
+                confetti.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

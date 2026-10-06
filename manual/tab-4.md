@@ -1,0 +1,1 @@
+The game is designed to help children overcome the difficulty of handling positive and negative numbers by connecting math with movement and play. The forward or backward moves work like a reward-penalty system makes children eager to play more thereby improving retention. The timer element teaches students to think quickly and accurately under mild pressure.
